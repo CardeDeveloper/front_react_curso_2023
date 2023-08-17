@@ -1,0 +1,11 @@
+.logo {
+    will-change: filter;
+    transition: filter 300ms;
+
+  }
+  
+  .logo.react:hover {
+    filter: drop-shadow(0 0 4rem #61dafbaa);
+  }
+
+  
