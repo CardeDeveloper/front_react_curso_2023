@@ -7,17 +7,36 @@ import { useSelector } from "react-redux"
 import { useNavigate } from 'react-router-dom'
 
 
+
 function Login() {
     const [isLogin, setIsLogin] = useState(true)
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
     const navigate = useNavigate();
     const dispatch = useDispatch()
+
+    
 
     const authFunction = (event) =>{
       if(isLogin){
         event.preventDefault()
-        dispatch(setCredentials({accessToken: "23", user: "test"}))
-        navigate("/home");
         //Funcion para autenticarse
+        fetch("http://localhost:3000/login", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({email: email, password: password})
+        })
+        .then(res => res.json())
+        .then(user => {
+          dispatch(setCredentials({accessToken: user.data.token, user: user.data.user}))
+          navigate("/home");
+        })
+        .catch(console.log)
+        
+        
      
 
       }else{
@@ -56,6 +75,8 @@ function Login() {
                   id="email"
                   name="email"
                   type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                   autoComplete="email"
                   required
                   className="block w-full rounded-md border-0 py-1.5 text-white-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -77,6 +98,8 @@ function Login() {
               <div className="mt-2">
                 <input
                   id="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
                   name="password"
                   type="password"
                   autoComplete="current-password"

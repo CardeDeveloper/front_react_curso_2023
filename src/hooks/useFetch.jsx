@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export function useFetch(url,method, params, body) {
+export function useFetch(url, options) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,13 +10,16 @@ export function useFetch(url,method, params, body) {
     const abortController = new AbortController();
     setController(abortController);
 
-    fetch(url, { signal: abortController.signal })
+    options.signal = abortController.signal
+
+    fetch(url,options)
       .then((response) => response.json())
       .then((json) => setData(json))
       .catch((error) => {
         if (error.name === "AbortError") {
           console.log("Cancelled request");
         } else {
+          console.log(error)
           setError(error);
         }
       })

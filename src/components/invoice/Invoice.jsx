@@ -1,8 +1,12 @@
 
 import { useEffect, useState } from 'react'
+import { useSelector} from "react-redux"
+import { selectCurrentToken } from "../../auth/authSlice"
 
 
 function Invoice({id, amount, date}) {
+    const token = useSelector(selectCurrentToken)
+    const [isHidden, setIsHidden] = useState(false)
     const [amount2, setAmount] = useState(amount)
     const [editable , setEditable] = useState(true)
     
@@ -20,17 +24,60 @@ function Invoice({id, amount, date}) {
       //TODO hacer la funcion conel fetch para mandar la peticion enla API
       setEditable(!editable)
 
+      fetch("http://localhost:3000/invoices/" + id,{
+          method:'PUT',
+          headers:{
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'x-access-token' : token
+          },
+          body:JSON.stringify({amount: amount2})
+        })
+      .then((response) => response.json())
+      .then((json) => {
+
+       alert("Valor Actualizado")
+      })
+      .catch((error) => {
+        if (error.name === "AbortError") {
+          console.log("Cancelled request");
+        } else {
+          console.log(error)
+        }
+      })
+
 
     }
 
     const deleteRecord = ()=>{
       //TODO hacer el fetch para borrar el esta factura en la API.
-      console.log(id)
+      
+
+      fetch("http://localhost:3000/invoices/" + id,{
+          method:'DELETE',
+          headers:{
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'x-access-token' : token
+          }
+        })
+      .then((response) => response.json())
+      .then((json) => {
+        setIsHidden(true)
+        alert("Elemento eliminado")
+      })
+      .catch((error) => {
+        if (error.name === "AbortError") {
+          console.log("Cancelled request");
+        } else {
+          console.log(error)
+        }
+      })
     }
   
     return (
     <>
-       <article className="bg-white rounded shadow border p-6 w-64 flex flex-col center-align-items">
+       <article className={isHidden ? "hidden":"bg-white rounded shadow border p-6 w-64 flex flex-col center-align-items"}>
         <h5 className="text-black text-3xl font-bold mb-4 mt-0 text-center">#{id}</h5>
         <section className="flex flex-col py-px">
           <div className={`${!editable ? 'hidden ' : ''} text-black text-sm text-center font-bold`}>${amount2}</div>
